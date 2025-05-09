@@ -43,7 +43,7 @@ The goal is to offer developers a **clear visual and code-level comparison** bet
 ## 🔗 Live Comparison Page
 
 Hosted via GitHub Pages:  
-📄 [React vs. Hotwire Guide](https://yourusername.github.io/your-repo-name/)
+📄 [React vs. Hotwire Guide](https://vidhyasree-n.github.io/loan_comparison_tool/comparison_page/)
 
 ---
 
