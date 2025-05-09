@@ -1,0 +1,25 @@
+<div data-controller="loan" class="min-h-screen bg-gray-100 p-6 flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-2xl w-full space-y-6">
+    <h1 class="text-3xl font-bold text-blue-700">Loan Offer Comparison (Hotwire)</h1>
+
+    <form data-action="submit->loan#submit" data-loan-target="form" class="space-y-4">
+      <div>
+        <label class="block font-medium text-gray-700">Loan Amount ($)</label>
+        <input type="number" data-loan-target="amount" class="border border-gray-300 rounded-md px-3 py-2 w-full" required />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-700">Loan Term (months)</label>
+        <input type="number" data-loan-target="term" class="border border-gray-300 rounded-md px-3 py-2 w-full" required />
+      </div>
+
+      <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition duration-200">
+        Compare Offers
+      </button>
+    </form>
+
+    <div data-loan-target="offers" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+      <!-- Offers will be inserted here -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>React vs. Hotwire</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+</head>
+<body class="h-screen bg-gray-100 font-sans">
+    <header class="text-center py-10 bg-white shadow-sm mb-8">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-2">React vs. Hotwire</h1>
+        <p class="text-lg text-gray-500">A side-by-side guide to help you understand and migrate between the two</p>
+        <p class="text-sm text-gray-400 mt-2">by <strong>Vidhya Sree Narayanappa</strong></p>
+    </header>
+      
+    <div class="flex flex-col md:flex-row text-sm text-gray-700 mb-10">
+        <!-- React Intro -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h2 class="text-xl font-semibold text-blue-600 mb-2">What is React?</h2>
+          <p class="mb-2">
+            React is a client-side JavaScript library for building user interfaces. It renders UI components inside the browser using a virtual DOM and updates the UI dynamically as state changes.
+          </p>
+          <p class="mb-2">
+            It's commonly used to build Single Page Applications (SPAs), dashboards, and highly interactive web apps.
+          </p>
+          <p>
+            React apps usually fetch data from an API and manage everything — rendering, routing, and state — in the browser.
+          </p>
+        </div>
+      
+        <!-- Hotwire Intro -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h2 class="text-xl font-semibold text-red-600 mb-2">What is Hotwire?</h2>
+          <p class="mb-2">
+            Hotwire is a set of tools (Turbo + Stimulus) built into Rails for creating fast, interactive apps without writing much JavaScript.
+          </p>
+          <p class="mb-2">
+            It sends HTML from the server and updates only parts of the page via Turbo. Stimulus adds light interactivity via DOM-connected controllers.
+          </p>
+          <p>
+            Hotwire keeps most logic on the server, allowing developers to build modern-feeling UIs within a traditional Rails monolith.
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React Use Cases -->
+        <div class="w-full md:w-1/2 bg-blue-50 border-r border-blue-200 p-6">
+          <h3 class="text-xl font-bold text-blue-700 mb-4 text-center">🧠 Use React When...</h3>
+          <ul class="list-disc list-inside space-y-2 text-sm text-blue-900">
+            <li>You’re building a single-page app (SPA)</li>
+            <li>Your UI requires real-time interactivity or complex client-side logic</li>
+            <li>You need reusable, isolated components</li>
+            <li>You want a frontend that works independently from backend stack</li>
+          </ul>
+        </div>
+      
+        <!-- Hotwire Use Cases -->
+        <div class="w-full md:w-1/2 bg-red-50 border-l border-red-200 p-6">
+          <h3 class="text-xl font-bold text-red-700 mb-4 text-center">🧠 Use Hotwire When...</h3>
+          <ul class="list-disc list-inside space-y-2 text-sm text-red-900">
+            <li>You’re building a Rails monolith or admin tool</li>
+            <li>You prefer server-rendered HTML and minimal JS</li>
+            <li>You want fast prototyping with fewer dependencies</li>
+            <li>Your team is already experienced in Rails</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="text-center mb-10 px-4">
+        <h4 class="text-3xl font-semibold text-gray-600 mb-2">A practical breakdown of how core concepts translate between React and Hotwire.</h4>
+      </div>
+      
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: Form Submission -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – Form Submission</h3>
+          <p class="mb-2 text-sm">Handled using controlled inputs and <code>fetch()</code>. State is updated after data is fetched.</p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      const [loanAmount, setLoanAmount] = useState("");
+      const [offers, setOffers] = useState([]);
+      
+      const fetchOffers = async () => {
+        const res = await fetch(`/api/loan_offers?amount=${loanAmount}`);
+        const data = await res.json();
+        setOffers(data);
+      };
+      
+      return (
+        &lt;form onSubmit={e => { e.preventDefault(); fetchOffers(); }}&gt;
+          &lt;input value={loanAmount} onChange={e => setLoanAmount(e.target.value)} /&gt;
+          &lt;button type="submit"&gt;Submit&lt;/button&gt;
+        &lt;/form&gt;
+      );
+          </pre>
+        </div>
+      
+        <!-- Hotwire: Form Submission -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – Form Submission</h3>
+          <p class="mb-2 text-sm">Handled using a Stimulus controller. Data is fetched and DOM updated manually or via Turbo.</p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      &lt;form data-controller="loan"
+            data-action="submit->loan#submit"&gt;
+        &lt;input type="number" data-loan-target="amount" /&gt;
+        &lt;button type="submit"&gt;Submit&lt;/button&gt;
+      &lt;/form&gt;
+      
+      loan_controller.js:
+      submit(e) {
+        e.preventDefault();
+        const amount = this.amountTarget.value;
+      
+        fetch(`/api/loan_offers?amount=${amount}`)
+          .then(res => res.json())
+          .then(data => this.updateDOM(data));
+      }
+          </pre>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: Routing -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – Routing</h3>
+          <p class="mb-2 text-sm">React uses client-side routing with libraries like <code>react-router-dom</code>. Navigation does not trigger a full page reload.</p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      import {
+        BrowserRouter as Router,
+        Routes,
+        Route,
+        Link
+      } from "react-router-dom";
+      
+      function App() {
+        return (
+          &lt;Router&gt;
+            &lt;nav&gt;
+              &lt;Link to="/compare"&gt;Compare Offers&lt;/Link&gt;
+            &lt;/nav&gt;
+            &lt;Routes&gt;
+              &lt;Route path="/compare" element={&lt;ComparePage /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/Router&gt;
+        );
+      }
+          </pre>
+        </div>
+      
+        <!-- Hotwire: Routing -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – Routing</h3>
+          <p class="mb-2 text-sm">Routing is handled server-side via Rails routes. Turbo makes page transitions seamless without JavaScript.</p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      # config/routes.rb
+      get "loan_comparison", to: "pages#loan_comparison"
+      
+      # link_to in ERB
+      &lt;%= link_to "Compare Offers", loan_comparison_path, data: { turbo_frame: "_top" } %&gt;
+      
+      # app/controllers/pages_controller.rb
+      def loan_comparison
+        render :loan_comparison
+      end
+          </pre>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: Rendering -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – Rendering</h3>
+          <p class="mb-2 text-sm">
+            React uses a <strong>Virtual DOM</strong> to render UI components in the browser. It updates the DOM efficiently by comparing previous and current states.
+          </p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      function OfferCard({ offer }) {
+        return (
+          &lt;div className="card"&gt;
+            &lt;h2&gt;{offer.bank_name}&lt;/h2&gt;
+            &lt;p&gt;APR: {offer.apr}%&lt;/p&gt;
+            &lt;p&gt;Monthly: ${offer.monthly_payment}&lt;/p&gt;
+          &lt;/div&gt;
+        );
+      }
+      
+      function App() {
+        return (
+          &lt;div&gt;
+            {offers.map((offer) =&gt; (
+              &lt;OfferCard key={offer.id} offer={offer} /&gt;
+            ))}
+          &lt;/div&gt;
+        );
+      }
+          </pre>
+        </div>
+      
+        <!-- Hotwire: Rendering -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – Rendering</h3>
+          <p class="mb-2 text-sm">
+            Rendering happens <strong>server-side</strong> with Rails views (ERB). Turbo Streams and Stimulus update or replace parts of the DOM automatically.
+          </p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      # app/views/pages/_offer_card.html.erb
+      &lt;div class="card"&gt;
+        &lt;h2&gt;&lt;%= offer.bank_name %&gt;&lt;/h2&gt;
+        &lt;p&gt;APR: &lt;%= offer.apr %&gt;%&lt;/p&gt;
+        &lt;p&gt;Monthly: $&lt;%= offer.monthly_payment %&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      
+      # Render from controller or view
+      &lt;%= render partial: "offer_card", collection: @offers %&gt;
+          </pre>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: State Management -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – State Management</h3>
+          <p class="mb-2 text-sm">
+            React manages state entirely in the browser using <code>useState</code>, <code>useReducer</code>, or libraries like Redux, Zustand, etc. Component state triggers re-renders.
+          </p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      const [loanAmount, setLoanAmount] = useState(10000);
+      const [offers, setOffers] = useState([]);
+      
+      const updateAmount = (e) => setLoanAmount(e.target.value);
+          </pre>
+          <p class="text-sm mt-2">
+            State is <strong>ephemeral</strong> — unless persisted to a database or local storage, it's lost on reload.
+          </p>
+        </div>
+      
+        <!-- Hotwire: State Management -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – State Management</h3>
+          <p class="mb-2 text-sm">
+            Hotwire doesn't rely on frontend state libraries. State is <strong>kept on the server</strong> (via models or sessions), and UI reflects it via rendered HTML.
+          </p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      # app/controllers/offers_controller.rb
+      def index
+        @offers = Offer.for_amount(params[:amount])
+      end
+      
+      # app/views/offers/index.turbo_stream.erb
+      &lt;%= turbo_stream.replace "offers" do %&gt;
+        &lt;%= render partial: "offer_card", collection: @offers %&gt;
+      &lt;% end %&gt;
+          </pre>
+          <p class="text-sm mt-2">
+            Turbo Streams replace DOM elements to reflect the latest server-side state.
+          </p>
+        </div>
+      </div>  
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: Tooling -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – Tooling</h3>
+          <p class="mb-2 text-sm">
+            React development requires Node.js and tools like Vite or Webpack to bundle and serve JavaScript. You'll also manage npm dependencies and transpile JSX.
+          </p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      npm create vite@latest react-app
+      cd react-app
+      npm install
+      npm run dev
+          </pre>
+          <p class="text-sm mt-2">
+            You also need to configure CORS if you're hitting a separate backend (like Rails API).
+          </p>
+        </div>
+      
+        <!-- Hotwire: Tooling -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – Tooling</h3>
+          <p class="mb-2 text-sm">
+            Hotwire ships with Rails 7+ out of the box. No bundlers, Node, or npm are required. Stimulus controllers live in <code>app/javascript</code> and are managed by import maps.
+          </p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      rails new app_name --css=tailwind
+      # Hotwire is included by default (Turbo + Stimulus)
+      
+      bin/rails generate stimulus loan
+          </pre>
+          <p class="text-sm mt-2">
+            Dev server is the Rails server itself — no separate build pipeline or proxying.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React: Component & Toggle -->
+        <div class="w-full md:w-1/2 bg-white p-6 border-r">
+          <h3 class="text-lg font-semibold text-blue-600 mb-2">React – Components & Toggle</h3>
+          <p class="mb-2 text-sm">
+            React creates reusable UI using functional components. Toggling visibility is handled with <code>useState</code>.
+          </p>
+          <pre class="bg-gray-100 text-xs p-4 rounded overflow-x-auto">
+      function OfferCard({ offer }) {
+        return (
+          &lt;div className="card"&gt;
+            &lt;h2&gt;{offer.bank_name}&lt;/h2&gt;
+            &lt;p&gt;APR: {offer.apr}%&lt;/p&gt;
+          &lt;/div&gt;
+        );
+      }
+      
+      function TogglePanel() {
+        const [open, setOpen] = useState(false);
+        return (
+          &lt;div&gt;
+            &lt;button onClick={() =&gt; setOpen(!open)}&gt;Toggle&lt;/button&gt;
+            {open && &lt;div&gt;This is visible!&lt;/div&gt;}
+          &lt;/div&gt;
+        );
+      }
+          </pre>
+        </div>
+      
+        <!-- Hotwire: Partial & Stimulus -->
+        <div class="w-full md:w-1/2 bg-gray-50 p-6">
+          <h3 class="text-lg font-semibold text-red-600 mb-2">Hotwire – Partials & DOM Toggle</h3>
+          <p class="mb-2 text-sm">
+            Reusable UI is written in partials. Toggling is handled using a Stimulus controller and direct DOM access.
+          </p>
+          <pre class="bg-white text-xs p-4 rounded overflow-x-auto">
+      # app/views/components/_offer_card.html.erb
+      &lt;div class="card"&gt;
+        &lt;h2&gt;&lt;%= offer.bank_name %&gt;&lt;/h2&gt;
+        &lt;p&gt;APR: &lt;%= offer.apr %&gt;%&lt;/p&gt;
+      &lt;/div&gt;
+      
+      # Reuse in views:
+      &lt;%= render partial: "components/offer_card", locals: { offer: offer } %&gt;
+      
+      # DOM toggle (Stimulus)
+      &lt;div data-controller="toggle"&gt;
+        &lt;button data-action="click->toggle#toggle"&gt;Toggle&lt;/button&gt;
+        &lt;div data-toggle-target="panel" class="hidden"&gt;This is visible!&lt;/div&gt;
+      &lt;/div&gt;
+      
+      # toggle_controller.js
+      toggle() {
+        this.panelTarget.classList.toggle("hidden")
+      }
+          </pre>
+        </div>
+      </div>      
+
+      <div class="flex flex-col md:flex-row mb-12">
+        <!-- React Migration Context -->
+        <div class="w-full md:w-1/2 bg-blue-50 border-r border-blue-200 p-6">
+          <h3 class="text-xl font-bold text-blue-700 mb-4 text-center">⚠️ React Migration Notes</h3>
+          <ul class="list-disc list-inside space-y-2 text-sm text-blue-900">
+            <li>Look for controlled components — you'll need to handle inputs differently in ERB.</li>
+            <li>APIs that were client-side will likely become controller actions or partial renders.</li>
+            <li>JSX-specific logic (e.g., inline conditions) should move to controller/view helpers.</li>
+            <li>You’ll often replace useState with form inputs + instance variables in Rails.</li>
+            <li>React fragments, portals, or context are not needed — use partials and layouts instead.</li>
+          </ul>
+        </div>
+      
+        <!-- Hotwire Migration Advice -->
+        <div class="w-full md:w-1/2 bg-red-50 border-l border-red-200 p-6">
+          <h3 class="text-xl font-bold text-red-700 mb-4 text-center">✅ Hotwire Migration Tips</h3>
+          <ul class="list-disc list-inside space-y-2 text-sm text-red-900">
+            <li>Break your React components into Rails partials (views/components/_card.html.erb).</li>
+            <li>Move async behavior into Stimulus controllers (e.g., fetch, submit, toggle).</li>
+            <li>Use Turbo frames/streams to update only parts of the page — no JS needed.</li>
+            <li>Use Rails UJS for `remote: true` behavior or replace with Turbo actions.</li>
+            <li>Don’t overthink — you often need less logic, not more, in Hotwire.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <footer class="bg-gray-100 border-t py-6 text-center text-sm text-gray-600">
+        <p class="mb-2 font-semibold">📚 Helpful Resources</p>
+        <div class="flex justify-center flex-wrap gap-4 text-blue-600">
+          <a href="https://reactjs.org/" target="_blank" class="hover:underline">React Docs</a>
+          <a href="https://hotwired.dev/" target="_blank" class="hover:underline">Hotwire Overview</a>
+          <a href="https://turbo.hotwired.dev/" target="_blank" class="hover:underline">Turbo Docs</a>
+          <a href="https://stimulus.hotwired.dev/" target="_blank" class="hover:underline">Stimulus Docs</a>
+          <a href="https://guides.rubyonrails.org/" target="_blank" class="hover:underline">Rails Guides</a>
+        </div>
+        <div class="text-xs text-gray-500 mt-4">
+            Built by <strong>Vidhya Sree</strong> — 
+            <a href="https://github.com/VidhyaSree-N" target="_blank" class="text-blue-600 hover:underline">GitHub</a> • 
+            <a href="https://linkedin.com/in/vidhyasree" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+          </div>
+      </footer>                      
+            
+</body>
+</html>
